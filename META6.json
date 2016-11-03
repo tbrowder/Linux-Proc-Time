@@ -1,0 +1,26 @@
+{
+    "perl"        : "6.c",
+    "name"        : "Linux::Proc::Time",
+    "version"     : "0.1.0",
+    "description" : "Provides a function to gather process times for a command",
+    "authors"     : [ "github:tbrowder" ],
+    "license"     : "Artistic 2.0",
+    "source-url"  : "https://github.com/tbrowder/Linux-Proc-Time-Perl6",
+    "support"     : {
+        "bugtracker" : "https://github.com/tbrowder/Linux-Proc-Time-Perl6/issues",
+        "source"     : "https://github.com/tbrowder/Linux-Proc-Time-Perl6"
+    },
+    "provides"    : {
+        "Linux::Proc::Time" : "lib/Linux/Proc/Time.pm6"
+    },
+    "test-depends"     : [
+	"Test::META"
+    ],
+    "depends" : [
+    ],
+    "resources" : [
+    ],
+    "tags" : [
+	"POSIX time function"
+    ]
+}
