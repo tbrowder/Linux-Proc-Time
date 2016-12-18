@@ -1,8 +1,23 @@
-sudo: false
+# version for 'time'
+sudo: true
 language: perl6
 perl6:
     - latest
+
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y time
+
 install:
     - rakudobrew build-panda
     - panda installdeps .
-    - panda install zef
+
+# # orig version
+# sudo: false
+# language: perl6
+# perl6:
+#     - latest
+# install:
+#     - rakudobrew build-panda
+#     - panda installdeps .
+#     - panda install zef
