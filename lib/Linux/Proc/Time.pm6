@@ -91,7 +91,7 @@ sub read-sys-time($time-file, :$uts) {
 # Purpose : Convert time in seconds to hms format
 # Params  : Time in seconds
 # Returns : Time in hms format, e.g, "3h02m02.65s"
-sub delta-time-hms($Time) returns Str is export(:delta-time-hms) {
+sub delta-time-hms($Time --> Str) is export(:delta-time-hms) {
     #say "DEBUG exit: Time: $Time";
     #exit;
 
