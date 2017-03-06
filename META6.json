@@ -17,7 +17,6 @@
 	"Test::META"
     ],
     "depends" : [
-	"File::Temp"
     ],
     "resources" : [
     ],

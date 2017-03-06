@@ -17,30 +17,24 @@ BEGIN {
 
 #------------------------------------------------------------------------------
 # Subroutine: time-command
-# Purpose : Collect the process times for a system command
-# Params  : The command as a string, optionally a parameter to ask for user time only
-# Returns : A list of times or user time only
+# Purpose : Collect the process times for a system command (using the GNU 'time' command).
+# Params  : The command as a string, optionally a parameter to ask for user time only. Note that special characters are not recognized by the 'run' routine, so results may not be as expected.
+# Returns : A list of times or user time only.
 sub time-command(Str:D $cmd, :$uts) is export(:time-command) {
-    # runs the input cmd using the system 'time' function and returns
+    # runs the input cmd using the system 'run' function and returns
     # the process times shown below
 
-    use File::Temp;
-    # get a temp file (File::Find)
-    my ($filename, $filehandle);
-    if !$DEBUG {
-	($filename, $filehandle) = tempfile;
-    }
-    else {
-	($filename, $filehandle) = tempfile(:tempdir('./tmp'), :!unlink);
-    }
-    my $TCMD = "time -p -o $filename";
-    my $proc = shell "$TCMD $cmd"; #, :out;
+    my $TCMD = "time -p";
+    my $args = "$TCMD $cmd";
+    #my $proc = shell "$TCMD $cmd"; #, :out;
+    my $proc = run $args.words, :out;
 
+    my $result = $proc.out.slurp-rest;
     if $uts {
-        return read-sys-time(:uts(True), $filename);
+        return read-sys-time($result, :uts(True));
     }
     else {
-        return read-sys-time($filename);
+        return read-sys-time($result);
     }
 
 } # time-command
@@ -48,13 +42,13 @@ sub time-command(Str:D $cmd, :$uts) is export(:time-command) {
 #------------------------------------------------------------------------------
 # Subroutine: read-sys-time
 # Purpose : An internal helper function that is not exported
-# Params  : Name of a file that contains output from the GNU 'time' command
+# Params  : Name of a string that contains output from the GNU 'time' command
 # Returns : A list or a single value depending upon the presence of the ':$uts' variable
-sub read-sys-time($time-file, :$uts) {
-    say "DEBUG: time-file '$time-file'" if $DEBUG;
+sub read-sys-time($result, :$uts) {
+    say "DEBUG: time result '$result'" if $DEBUG;
     my ($Rts, $Uts, $Sts);
-    for $time-file.IO.lines -> $line {
-	say "DEBUG: line: $line" if $DEBUG;
+    for $result.lines -> $line {
+	#say "DEBUG: line: $line" if $DEBUG;
 
 	my $typ = $line.words[0];
 	my $sec = $line.words[1];
@@ -74,13 +68,15 @@ sub read-sys-time($time-file, :$uts) {
 	}
     }
 
-    # convert each to hms
-    my $rt = delta-time-hms($Rts);
-    my $ut = delta-time-hms($Uts);
-    my $st = delta-time-hms($Sts);
-
     # back to the caller
     return $Uts if $uts;
+
+    # convert each to hms
+    my $rt = delta-time-hms(+$Rts);
+    my $ut = delta-time-hms(+$Uts);
+    my $st = delta-time-hms(+$Sts);
+
+    # back to the caller
     return $Rts, $rt,
            $Uts, $ut,
            $Sts, $st;
@@ -91,19 +87,19 @@ sub read-sys-time($time-file, :$uts) {
 # Purpose : Convert time in seconds to hms format
 # Params  : Time in seconds
 # Returns : Time in hms format, e.g, "3h02m02.65s"
-sub delta-time-hms($Time --> Str) is export(:delta-time-hms) {
+sub delta-time-hms($Time) is export(:delta-time-hms) {
     #say "DEBUG exit: Time: $Time";
     #exit;
 
-    my Num $time = $Time.Num;
+    my $time = $Time; #.Num;
 
-    my Int $sec-per-min = 60;
-    my Int $min-per-hr  = 60;
-    my Int $sec-per-hr  = $sec-per-min * $min-per-hr;
+    my UInt $sec-per-min = 60;
+    my UInt $min-per-hr  = 60;
+    my UInt $sec-per-hr  = $sec-per-min * $min-per-hr;
 
-    my Int $hr  = ($time/$sec-per-hr).Int;
-    my Num $sec = $time - ($sec-per-hr * $hr);
-    my Int $min = ($sec/$sec-per-min).Int;
+    my UInt $hr  = ($time/$sec-per-hr).UInt;
+    my $sec = $time - ($sec-per-hr * $hr);
+    my UInt $min = ($sec/$sec-per-min).UInt;
 
     $sec = $sec - ($sec-per-min * $min);
 

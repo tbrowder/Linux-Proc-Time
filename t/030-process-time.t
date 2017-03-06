@@ -5,7 +5,7 @@ use Linux::Proc::Time :ALL;
 
 plan 1;
 
-my $cmd = 'ls -ld * > /dev/null';
+my $cmd = 'date';
 my $uts;
 
 lives-ok { $uts = time-command($cmd, :uts(True)) };
