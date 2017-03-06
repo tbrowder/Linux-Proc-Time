@@ -26,10 +26,9 @@ sub time-command(Str:D $cmd, :$uts) is export(:time-command) {
 
     my $TCMD = "time -p";
     my $args = "$TCMD $cmd";
-    #my $proc = shell "$TCMD $cmd"; #, :out;
-    my $proc = run $args.words, :out;
+    my $proc = run $args.words, :err;
 
-    my $result = $proc.out.slurp-rest;
+    my $result = $proc.err.slurp-rest;
     if $uts {
         return read-sys-time($result, :uts(True));
     }
@@ -53,15 +52,15 @@ sub read-sys-time($result, :$uts) {
 	my $typ = $line.words[0];
 	my $sec = $line.words[1];
 	given $typ {
-            when $_ ~~ /real/ {
+            when /real/ {
 		$Rts = sprintf "%.3f", $sec;
 		say "DEBUG: rts: $Rts" if $DEBUG;
             }
-            when $_ ~~ /user/ {
+            when /user/ {
 		$Uts = sprintf "%.3f", $sec;
 		say "DEBUG: uts: $Uts" if $DEBUG;
             }
-            when $_ ~~ /sys/ {
+            when /sys/ {
 		$Sts = sprintf "%.3f", $sec;
 		say "DEBUG: sts: $Sts" if $DEBUG;
             }
@@ -103,5 +102,7 @@ sub delta-time-hms($Time) is export(:delta-time-hms) {
 
     $sec = $sec - ($sec-per-min * $min);
 
-    return sprintf "%dh%02dm%05.2fs", $hr, $min, $sec;
+    my $ts = sprintf "%dh%02dm%05.2fs", $hr, $min, $sec;
+    return $ts;
+
 } # delta-time-hms

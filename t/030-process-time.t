@@ -3,9 +3,10 @@ use Test;
 
 use Linux::Proc::Time :ALL;
 
-plan 1;
+plan 2;
 
-my $cmd = 'date';
+my $cmd = 'sleep 5';
 my $uts;
 
 lives-ok { $uts = time-command($cmd, :uts(True)) };
+lives-ok { $uts = time-command($cmd) };
