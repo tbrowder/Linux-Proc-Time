@@ -139,11 +139,11 @@ sub read-sys-time($result,
             return "Real: $rt; User: $ut; Sys: $st";
         }
         when /^ :i r/ {
-            my $t = seconds-to-hms(+$Sts, :$fmt);
+            my $t = seconds-to-hms(+$Rts, :$fmt);
             return $t;
         }
         when /^ :i u/ {
-            my $t = seconds-to-hms(+$Sts, :$fmt);
+            my $t = seconds-to-hms(+$Uts, :$fmt);
             return $t;
         }
         when /^ :i s/ {
@@ -181,14 +181,14 @@ sub seconds-to-hms($Time,
     if !$fmt {
         $ts = ~$time;
     }
-    elsif $fmt ~~ /^ :i s|seconds $/ {
+    elsif $fmt ~~ /^ :i s/ {
         $ts = sprintf "%.2fs", $sec;
     } 
-    elsif $fmt ~~ /^ :i h|hms $/ {
-        $ts = sprintf "%dh%02dm%05.2fs", $hr, $min, $sec;
-    } 
-    elsif $fmt ~~ /^ :i ':'|'h:m:s' $/ {
+    elsif $fmt ~~ / ':'/ {
         $ts = sprintf "%d:%02d:%05.2f", $hr, $min, $sec;
+    } 
+    elsif $fmt ~~ /^ :i h/ {
+        $ts = sprintf "%dh%02dm%05.2fs", $hr, $min, $sec;
     } 
 
     return $ts;
