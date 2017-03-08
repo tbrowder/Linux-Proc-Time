@@ -21,7 +21,7 @@ my token aH { <typr> \s* <H> ';' \s* <typu> \s* <H> ';' \s* <typs> \s* <H> }
 
 my $prog = q:to/HERE/;
 my $i = 0;
-for 1..10_000 {
+for 1..100 {
     $i += 2;
 }
 HERE
@@ -31,7 +31,7 @@ spurt $script, $prog;
 my $cmd = "perl6 $script";
 
 my ($res, $typ, $fmt);
-my $debug = True;
+my $debug = False;
 
 my @typ = <a all r real u user s sys>;
 my @fmt = ['s', 'seconds', 'h', 'hms', ':', 'h:m:s'];

@@ -1,3 +1,21 @@
+Before first release
+====================
+
+- get META6.json into final, standard format for first releas (see RREADME.github-release)
+
+- get info in module source correctt
+
+- generate ALL-SUBS.md file
+
+- get changelog into final format
+
+- get TODO in final shape
+
+- get README into final shape
+
+Later possibilities
+===================
+
 - add option to control number of decimal places in output
 
 - add capability to report in days for long-running commands
