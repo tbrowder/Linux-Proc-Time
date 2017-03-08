@@ -25,7 +25,7 @@ my token fmt { ^ :i s|seconds|h|hms|':'|'h:m:s' $ }
 # Returns : A list of real (wall clock), user, and system times (in h:mm:ss.ss or hms format); or user time (in seconds) only.
 sub time-command(Str:D $cmd, 
                  :$typ where { $typ ~~ &typ } = 'u', 
-                 :$fmt where { if $fmt.defined { $fmt ~~ &fmt }},
+                 :$fmt where { !$fmt.defined || $fmt ~~ &fmt },
                ) is export(:time-command) {
     # runs the input cmd using the system 'run' function and returns
     # the process times shown below
@@ -77,7 +77,7 @@ sub time-command(Str:D $cmd,
 # Returns : A single value or multiple values depending upon the presence of a true ':$uts' variable.  The multiple values can be in one of two formats: hms or h:m:s (HMS) depending on the presence of a true ':$HMS' variable.
 sub read-sys-time($result,
                  :$typ where { $typ ~~ &typ } = 'u', 
-                 :$fmt where { $fmt ~~ &fmt },
+                 :$fmt where { !$fmt.defined || $fmt ~~ &fmt },
                  --> Str) {
 
     say "DEBUG: time result '$result'" if $DEBUG;
@@ -100,6 +100,12 @@ sub read-sys-time($result,
             when /sys/ {
 		$Sts = sprintf "%.3f", $sec;
 		say "DEBUG: sts: $Sts" if $DEBUG;
+            }
+            default {
+                if $line ~~ /exit|code/ && $line ~~ / (\d+) / {
+                    my $exitcode = +$0;
+                    die "FATAL: The timed command returned a non-zero exitcode: $exitcode";
+                }
             }
 	}
     }
@@ -154,7 +160,7 @@ sub read-sys-time($result,
 # Params  : Time in seconds
 # Returns : Time in hms format, e.g, '3h02m02.65s', or h:m:s format, e.g., '3:02:02.65'.
 sub seconds-to-hms($Time,
-                   :$fmt where { $fmt ~~ &fmt },
+                   :$fmt where { !$fmt.defined || $fmt ~~ &fmt },
                   ) is export(:seconds-to-hms) {
     #say "DEBUG exit: Time: $Time";
     #exit;
