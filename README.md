@@ -10,25 +10,24 @@ This module uses the GNU **time** command (usually installed as '/usr/bin/time')
     use Linux::Proc::Time :time-command;
     my $cmd = "some-user-prog arg1 arg2";
     my $user-time = time-command $cmd;
-    say $user-time;
-    42.70 # seconds
+    say $user-time; # output: 42.70 # seconds
 
-## Getting the time command
+## Getting the **time** command
 
 On Debian hosts the **time** command may not installed by default but it is available in
-package 'time' ???.  It can also be built from source available at the Free Software
+package 'time'.  It can also be built from source available at the Free Software
 Foundation's git site.  Clone the source repository:
 
-  git clone https://git.savannah.gnu.org/git/time.git
+    $ git clone https://git.savannah.gnu.org/git/time.git
 
 The build and install instructions are in the repository along with the source code.
 
 Unfortunately, there is no equivalent command available for Windows unless you install Cygwin or an equivalent system.
 
-## The time command
+## The **time** command
 
-The details for running time are described in time's man page which can be viewed by
-running 'man 1 time'.
+The details for running **time** are described in **time**'s man page which can be viewed by
+running 'man 1 time' at the command line.
 
 This module will look for time in the following locations and order:
 
@@ -36,8 +35,9 @@ This module will look for time in the following locations and order:
 - /usr/local/bin/time
 - /usr/bin/time
 
-If the time command is not found, an exception will be thrown.
-Likewise, if the time command returns an exit code other than zero, an exception will be thrown.
+If the **time** command is not found, an exception will be thrown.
+Likewise, if the **time** command returns an exit code other than zero, an exception will be thrown.
 
+## LICENCE and COPYRIGHT
 
 

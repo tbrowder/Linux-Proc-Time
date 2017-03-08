@@ -1,0 +1,9 @@
+- add option to control number of decimal places in output
+
+- add capability to report in days for long-running commands
+
+- consider an asynchronous mode to sample proc file system periodically
+
+- add options to report time in minutes, hours, and days only (as decimal fractions)
+
+- consider adding other data provided by the system time command
