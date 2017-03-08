@@ -7,11 +7,11 @@ This module uses the GNU **time** command (usually installed as '/usr/bin/time')
 
 ## Synopsis
 
-    use Linux::Proc::Time;
+    use Linux::Proc::Time :time-command;
     my $cmd = "some-user-prog arg1 arg2";
-    my $user-time = time-command $cmd, uts;
+    my $user-time = time-command $cmd;
     say $user-time;
-    0h0m42.7s
+    42.70 # seconds
 
 ## Getting the time command
 
@@ -37,7 +37,7 @@ This module will look for time in the following locations and order:
 - /usr/bin/time
 
 If the time command is not found, an exception will be thrown.
-Likewise, if the time command returns an exitcode other than zero, an exception will be thrown.
+Likewise, if the time command returns an exit code other than zero, an exception will be thrown.
 
 
 

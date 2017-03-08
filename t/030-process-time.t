@@ -3,7 +3,7 @@ use Test;
 
 use Linux::Proc::Time :ALL;
 
-plan 20;
+plan 25;
 
 my $prog = q:to/HERE/;
 my $i = 0;
@@ -21,30 +21,30 @@ my ($res, $typ, $fmt);
 my $debug = True;
 
 my @typ = <a r u s>;
-my @fmt = <s h H>;
+my @fmt = <b s h h:m:s>;
 
 
 # check the default for both args
 lives-ok { $res = time-command $cmd };
-say $res if $debug;
+say "debug: \$res = '$res'" if $debug;
 
 # check the default for the fmt arg
 for @typ -> $typ {
     lives-ok { $res = time-command $cmd, :$typ };
-    say $res if $debug;
+    say "debug: \$res = '$res'" if $debug;
 }
 
 # check the default for the typ arg
 for @fmt -> $fmt {
     lives-ok { $res = time-command $cmd, :$fmt };
-    say $res if $debug;
+    say "debug: \$res = '$res'" if $debug;
 }
 
 # check all arg combinations
 for @typ -> $typ {
     for @fmt -> $fmt {
         lives-ok { $res = time-command $cmd, :$typ, :$fmt };
-        say $res if $debug;
+        say "debug: \$res = '$res'" if $debug;
     }
 }
 

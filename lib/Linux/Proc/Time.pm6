@@ -21,8 +21,8 @@ BEGIN {
 # Params  : The command as a string, and two parameters with default values that describe which type of time values to return and in what format. Note that special characters are not recognized by the 'run' routine, so results may not be as expected if they are part of the command.
 # Returns : A list of real (wall clock), user, and system times (in h:mm:ss.ss or hms format); or user time (in seconds) only.
 sub time-command(Str:D $cmd, 
-                 :$typ where { $typ ~~ /^ <[arus]>**1 $/ } = 'u', 
-                 :$fmt where { $fmt ~~ /^ <[shH]>**1 $/ } = 's',
+                 :$typ where { $typ ~~ /^ :i [a|all|r|real|u|user|s|sys] $/ } = 'u', 
+                 :$fmt where { $fmt ~~ /^ :i [b|bare|s|seconds|h|hms|h:m:s] $/ } = 'b',
                ) is export(:time-command) {
     # runs the input cmd using the system 'run' function and returns
     # the process times shown below
@@ -68,8 +68,8 @@ sub time-command(Str:D $cmd,
 # Params  : A string that contains output from the GNU 'time' command, and two parameters with default values that describe which type of tome values to return and in what format.
 # Returns : A single value or multiple values depending upon the presence of a true ':$uts' variable.  The multiple values can be in one of two formats: hms or h:m:s (HMS) depending on the presence of a true ':$HMS' variable.
 sub read-sys-time($result,
-                 :$typ where { $typ ~~ /^ <[arus]>**1 $/ } = 'u', 
-                 :$fmt where { $fmt ~~ /^ <[shH]>**1 $/ } = 's',
+                 :$typ where { $typ ~~ /^ :i [a|all|r|real|u|user|s|sys] $/ } = 'u', 
+                 :$fmt where { $fmt ~~ /^ :i [b|bare|s|seconds|h|hms|h:m:s] $/ } = 'b',
                  --> Str) {
 
     say "DEBUG: time result '$result'" if $DEBUG;
@@ -96,7 +96,7 @@ sub read-sys-time($result,
 	}
     }
 
-    if $fmt eq 's' {
+    if $fmt eq 'b' {
         # returning raw seconds
         given $typ {
             when 'a' {
@@ -146,7 +146,7 @@ sub read-sys-time($result,
 # Params  : Time in seconds
 # Returns : Time in hms format, e.g, '3h02m02.65s', or h:m:s format, e.g., '3:02:02.65'.
 sub delta-time-hms($Time,
-                   :$fmt where { $fmt ~~ /^ <[hH]>**1 $/ } = 'h',
+                   :$fmt where { $fmt ~~ /^ :i [b|bare|s|seconds|h|hms|h:m:s] $/ } = 'b',
                   ) is export(:delta-time-hms) {
     #say "DEBUG exit: Time: $Time";
     #exit;
@@ -164,12 +164,18 @@ sub delta-time-hms($Time,
     $sec = $sec - ($sec-per-min * $min);
 
     my $ts;
-    if $fmt eq 'h' {
-        $ts = sprintf "%dh%02dm%05.2fs", $hr, $min, $sec;
+    if $fmt ~~ /^ :i [b|bare] $/ {
+        $ts = ~$time;
     }
-    else {
+    elsif $fmt ~~ /^ :i [s|seconds] $/ {
+        $ts = sprintf "%.2fs", $sec;
+    } 
+    elsif $fmt ~~ /^ :i [h|hms] $/ {
+        $ts = sprintf "%dh%02dm%05.2fs", $hr, $min, $sec;
+    } 
+    elsif $fmt ~~ /^ :i [h:m:s] $/ {
         $ts = sprintf "%d:%02d:%05.2f", $hr, $min, $sec;
-    }    
+    } 
 
     return $ts;
 
