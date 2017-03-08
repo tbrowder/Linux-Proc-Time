@@ -4,12 +4,11 @@ my token fmt { ^ :i a|b $ }
 
 foo;
 
-sub foo(:$fmt where { if $fmt.defined { $fmt ~~ &fmt }}) {
+sub foo(:$fmt where { if $fmt.defined { $fmt ~~ &fmt } else {True}}) {
     if $fmt {
-        say "fmt = $fmt"
+	say "fmt = $fmt"
     }
     else {
         say "fmt = undefined"
     }
 }
-
