@@ -101,7 +101,7 @@ corrections to this module, and pull requests, bug reports, and
 suggestions are always welcome.
 
 
-## LICENsE and COPYRIGHT
+## LICENSE and COPYRIGHT
 
 Artistic 2.0. See [LICENSE](https://github.com/tbrowder/linux-Proc-Time-Perl6/blob/master/LICENCE).
 
