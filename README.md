@@ -48,8 +48,11 @@ with its complete signature.
 ## The :$typ and :$fmt named parameters
 
 The two named parameters control the type and format of the output
-from the time-command.  The allowed values and a short description are
-described in the source code and are repeated here:
+from the time-command.  (Note there is a fourth format which is used
+if the **:$fmt** variable is not used or defined.  In that case only
+the raw time in seconds is shown without any other formatting.)  The
+allowed values and a short description are described in the source
+code and are repeated here:
 
 ```Perl6
 my token typ { ^ :i             # the desired time(s) to return:
