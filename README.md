@@ -80,7 +80,7 @@ API.
 
 ## Debugging
 
-For debugging, use one the following methods:
+For debugging, use one of the following methods:
 
 - set the module's $DEBUG variable:
 
