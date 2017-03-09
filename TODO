@@ -1,10 +1,6 @@
 Before first release
 ====================
 
-- get META6.json into final, standard format for first releas (see RREADME.github-release)
-
-- get info in module source correctt
-
 - generate ALL-SUBS.md file
 
 - get changelog into final format
@@ -12,6 +8,13 @@ Before first release
 - get TODO in final shape
 
 - get README into final shape
+
+Done
+====
+
+- get info in module source correct [DONE]
+
+- get META6.json into final, standard format for first release (see lib-p6/README.github-release) [DONE]
 
 Later possibilities
 ===================

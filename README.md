@@ -38,6 +38,68 @@ This module will look for time in the following locations and order:
 If the **time** command is not found, an exception will be thrown.
 Likewise, if the **time** command returns an exit code other than zero, an exception will be thrown.
 
-## LICENCE and COPYRIGHT
+# The Linux::Proc::Time module
+
+The routines are described in detail in
+[ALL-SUBS](https://github.com/tbrowder/Linux-Proc-Time-Perl6/blob/master/docs/ALL-SUBS.md)
+which shows a short description of each exported routine along along
+with its complete signature.
+
+## The :$typ and :$fmt named parameters
+
+The two named parameters control the type and format of the output
+from the time-command.  The allowed values and a short description are
+described in the source code and are repeated here:
+
+```Perl6
+my token typ { ^ :i             # the desired time(s) to return:
+                    a|all|      # show all three times:
+		                #   "Real: [time in desired format]; User: [ditto]; Sys: [ditto]"
+                    r|real|     # show only the real (wall clock) time
+                    u|user|     # show only the user time (default)
+                    s|sys       # show only the system time
+             $ }
+my token fmt { ^ :i             # the desired format for the returned time(s)
+                    s|seconds|  # time in seconds with an appended 's': "30.42s"
+                    h|hms|      # time in hms format: "0h00m30.42s"
+                    ':'|'h:m:s' # time in h:m:s format: "0:00:30.42"
+             $ }
+```
+
+## Status
+
+This version is 0.*.* which is considered usable but may not be ready
+for production.  The APIs are subject to change in which case the
+version major number will be updated. Note that newly added
+subroutines or application programs are not considered a change in
+API.
 
 
+## Debugging
+
+For debugging, use one the following methods:
+
+- set the module's $DEBUG variable:
+
+```Perl6
+:$Linux::Proc::Time::DEBUG = True;
+```
+
+- set the environment variable:
+
+```Perl6
+LINUX_PROC_TIME_MORE_DEBUG=1
+```
+
+## Contributing
+
+Interested users are encouraged to contribute improvements and
+corrections to this module, and pull requests, bug reports, and
+suggestions are always welcome.
+
+
+## LICENsE and COPYRIGHT
+
+Artistic 2.0. See [LICENSE](https://github.com/tbrowder/linux-Proc-Time-Perl6/blob/master/LICENCE).
+
+Copyright (C) 2017 Thomas M. Browder, Jr. <<tom.browder@gmail.com>>

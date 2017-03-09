@@ -16,26 +16,27 @@ BEGIN {
 
 # need some regexes to make life easier
 my token typ { ^ :i             # the desired time(s) to return:
-                    a|all|      # show all three times: ""
+                    a|all|      # show all three times:
+		                #   "Real: [time in desired format]; User: [ditto]; Sys: [ditto]"
                     r|real|     # show only the real (wall clock) time
                     u|user|     # show only the user time (default)
                     s|sys       # show only the system time
-             $ } 
+             $ }
 my token fmt { ^ :i             # the desired format for the returned time(s)
-                    s|seconds|  # time in seconds with an appended 's': ""
-                    h|hms|      # time in hms format: ""
-                    ':'|'h:m:s' # time in h:m:s format: ""
+                    s|seconds|  # time in seconds with an appended 's': "30.42s"
+                    h|hms|      # time in hms format: "0h00m30.42s"
+                    ':'|'h:m:s' # time in h:m:s format: "0:00:30.42"
              $ }
 
 #------------------------------------------------------------------------------
 # Subroutine: time-command
 # Purpose : Collect the process times for a system or user command (using the GNU 'time' command).
-# Params  : The command as a string, and two named parameters that describe which type of time values to return and in what format. Note that special characters are not recognized by the 'run' routine, so results may not be as expected if they are part of the command.
-# Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of three formats).
-sub time-command(Str:D $cmd, 
+# Params : The command as a string, and two named parameters that describe which type of time values to return and in what format. Note that special characters are not recognized by the 'run' routine, so results may not be as expected if they are part of the command.
+# Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of four formats).
+sub time-command(Str:D $cmd,
                  :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
                  :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
-                --> Str) is export(:time-command) {
+                 --> Str) is export(:time-command) {
     # runs the input cmd using the system 'run' function and returns
     # the process times shown below
 
@@ -49,7 +50,7 @@ sub time-command(Str:D $cmd,
     if %*ENV{$TE}:exists && %*ENV{$TE}.IO.f {
         $TCMD = %*ENV{$TE};
     }
-    else { 
+    else {
         for @t -> $t {
             if $t.IO.f {
                 $TCMD = $t;
@@ -60,7 +61,7 @@ sub time-command(Str:D $cmd,
     if !$TCMD.defined {
         die "FATAL: The 'time' command was not found on this host.";
     }
-       
+
     $TCMD ~= ' -p'; # the '-t' option gives the standard POSIX output display
     my $args = "$TCMD $cmd";
     my $proc = run $args.words, :err;
@@ -83,7 +84,7 @@ sub time-command(Str:D $cmd,
 # Subroutine: read-sys-time
 # Purpose : An internal helper function that is not exported.
 # Params  : A string that contains output from the GNU 'time' command, and two named parameters that describe which type of time values to return and in what format.
-# Returns : A single value or multiple values depending upon the presence of a true ':$uts' variable.  The multiple values can be in one of two formats: hms or h:m:s (HMS) depending on the presence of a true ':$HMS' variable.
+# Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of four formats).
 sub read-sys-time($result,
                  :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
                  :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
@@ -165,16 +166,14 @@ sub read-sys-time($result,
 
 #------------------------------------------------------------------------------
 # Subroutine: seconds-to-hms
-# Purpose : Return input time in seconds or convert time in seconds to hms or h:m:s format.
+# Purpose : Return input time in seconds (without or with a trailing 's') or convert time in seconds to hms or h:m:s format.
 # Params  : Time in seconds.
-# Returns : Time in in seconds or hms format, e.g, '3h02m02.65s', or h:m:s format, e.g., '3:02:02.65'.
+# Returns : Time in in seconds (without or with a trailing 's') or hms format, e.g, '3h02m02.65s', or h:m:s format, e.g., '3:02:02.65'.
 sub seconds-to-hms($Time,
                    :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
-                  ) is export(:seconds-to-hms) {
-    #say "DEBUG exit: Time: $Time";
-    #exit;
+                   --> Str) is export(:seconds-to-hms) {
 
-    my $time = $Time; 
+    my $time = $Time;
 
     my UInt $sec-per-min = 60;
     my UInt $min-per-hr  = 60;
@@ -192,13 +191,13 @@ sub seconds-to-hms($Time,
     }
     elsif $fmt ~~ /^ :i s/ {
         $ts = sprintf "%.2fs", $sec;
-    } 
+    }
     elsif $fmt ~~ / ':'/ {
         $ts = sprintf "%d:%02d:%05.2f", $hr, $min, $sec;
-    } 
+    }
     elsif $fmt ~~ /^ :i h/ {
         $ts = sprintf "%dh%02dm%05.2fs", $hr, $min, $sec;
-    } 
+    }
 
     return $ts;
 
