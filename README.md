@@ -71,7 +71,7 @@ my token fmt { ^ :i             # the desired format for the returned time(s)
 
 ## Status
 
-This version is 0.*.* which is considered usable but may not be ready
+This version is 0.\*.\* which is considered usable but may not be ready
 for production.  The APIs are subject to change in which case the
 version major number will be updated. Note that newly added
 subroutines or application programs are not considered a change in
