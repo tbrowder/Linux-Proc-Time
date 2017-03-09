@@ -54,7 +54,7 @@ described in the source code and are repeated here:
 ```Perl6
 my token typ { ^ :i             # the desired time(s) to return:
                     a|all|      # show all three times:
-		                #   "Real: [time in desired format]; User: [ditto]; Sys: [ditto]"
+                                #   "Real: [time in desired format]; User: [ditto]; Sys: [ditto]"
                     r|real|     # show only the real (wall clock) time
                     u|user|     # show only the user time (default)
                     s|sys       # show only the system time
