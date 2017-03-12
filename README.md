@@ -103,6 +103,6 @@ suggestions are always welcome.
 
 ## LICENSE and COPYRIGHT
 
-Artistic 2.0. See [LICENSE](https://github.com/tbrowder/Linux-Proc-Time-Perl6/blob/master/LICENCE).
+Artistic 2.0. See [LICENSE](https://github.com/tbrowder/Linux-Proc-Time-Perl6/blob/master/LICENSE).
 
 Copyright (C) 2017 Thomas M. Browder, Jr. <<tom.browder@gmail.com>>
