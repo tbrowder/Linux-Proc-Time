@@ -85,13 +85,13 @@ For debugging, use one of the following methods:
 - set the module's $DEBUG variable:
 
 ```Perl6
-:$Linux::Proc::Time::DEBUG = True;
+$Linux::Proc::Time::DEBUG = True;
 ```
 
 - set the environment variable:
 
 ```Perl6
-LINUX_PROC_TIME_MORE_DEBUG=1
+LINUX_PROC_TIME_DEBUG=1
 ```
 
 ## Contributing
