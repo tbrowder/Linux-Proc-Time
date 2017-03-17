@@ -48,72 +48,75 @@ like $res, &num;
 say "debug: test { ++$tn }; \$res = '$res'" if $res && $debug;
 
 # need a subroutine to check $res with like
-sub check($res, :$typ, :$fmt) {
+sub check($res, :$typ = False, :$fmt = False) {
     if !$fmt {
-        if !$typ { 
+        if !$typ ~~ /^a/ {
             like $res, &num;
         }
-        elsif $typ ~~ /^a/ { 
+        elsif $typ ~~ /^a/ {
             like $res, &an;
         }
-        elsif $typ ~~ /^r/ { 
+        elsif $typ ~~ /^r/ {
             like $res, &num;
         }
-        elsif $typ ~~ /^u/ { 
+        elsif $typ ~~ /^u/ {
             like $res, &num;
         }
-        elsif $typ ~~ /^s/ { 
+        elsif $typ ~~ /^s/ {
             like $res, &num;
         }
     }
     elsif $fmt ~~ /^s/ {
-        if !$typ { 
+        if !$typ {
             like $res, &s;
         }
-        elsif $typ ~~ /^a/ { 
+        elsif $typ ~~ /^a/ {
             like $res, &as;
         }
-        elsif $typ ~~ /^r/ { 
+        elsif $typ ~~ /^r/ {
             like $res, &s;
         }
-        elsif $typ ~~ /^u/ { 
+        elsif $typ ~~ /^u/ {
             like $res, &s;
         }
-        elsif $typ ~~ /^s/ { 
+        elsif $typ ~~ /^s/ {
             like $res, &s;
         }
     }
     elsif $fmt ~~ /':'/ {
-        if !$typ { 
+        if !$typ {
             like $res, &H;
         }
-        elsif $typ ~~ /^a/ { 
+        elsif $typ ~~ /^a/ {
             like $res, &aH;
         }
-        elsif $typ ~~ /^r/ { 
+        elsif $typ ~~ /^r/ {
             like $res, &H;
         }
-        elsif $typ ~~ /^u/ { 
+        elsif $typ ~~ /^u/ {
             like $res, &H;
         }
-        elsif $typ ~~ /^s/ { 
+        elsif $typ ~~ /^s/ {
             like $res, &H;
         }
     }
     elsif $fmt ~~ /^h/ {
-        if !$typ { 
+        if !$typ {
             like $res, &h;
         }
-        elsif $typ ~~ /^a/ { 
+        elsif $typ ~~ /^a/ {
+            like $res, &h;
+        }
+        elsif $typ ~~ /^a/ {
             like $res, &ah;
         }
-        elsif $typ ~~ /^r/ { 
+        elsif $typ ~~ /^r/ {
             like $res, &h;
         }
-        elsif $typ ~~ /^u/ { 
+        elsif $typ ~~ /^u/ {
             like $res, &h;
         }
-        elsif $typ ~~ /^s/ { 
+        elsif $typ ~~ /^s/ {
             like $res, &h;
         }
     }
