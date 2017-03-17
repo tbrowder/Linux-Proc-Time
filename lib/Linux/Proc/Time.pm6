@@ -19,10 +19,10 @@ my token typ { ^ :i             # the desired time(s) to return:
                     a|all|      # show all three times:
 		                #   "Real: [time in desired format]; User: [ditto]; Sys: [ditto]"
                     r|real|     # show only the real (wall clock) time
-                    u|user|     # show only the user time (default)
+                    u|user|     # show only the user time [default]
                     s|sys       # show only the system time
              $ }
-my token fmt { ^ :i             # the desired format for the returned time(s)
+my token fmt { ^ :i             # the desired format for the returned time(s) [default: raw seconds]
                     s|seconds|  # time in seconds with an appended 's': "30.42s"
                     h|hms|      # time in hms format: "0h00m30.42s"
                     ':'|'h:m:s' # time in h:m:s format: "0:00:30.42"
@@ -36,7 +36,8 @@ my token fmt { ^ :i             # the desired format for the returned time(s)
 sub time-command(Str:D $cmd,
                  :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
                  :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
-                 --> Str) is export(:time-command) {
+                 Bool :$list = False,                           # return a list as in the original API
+                ) is export(:time-command) {
     # runs the input cmd using the system 'run' function and returns
     # the process times shown below
 
@@ -72,10 +73,10 @@ sub time-command(Str:D $cmd,
 
     my $result = $proc.err.slurp-rest;
     if $fmt.defined {
-        return read-sys-time($result, :$typ, :$fmt);
+        return read-sys-time($result, :$typ, :$fmt, :$list);
     }
     else {
-        return read-sys-time($result, :$typ);
+        return read-sys-time($result, :$typ, :$list);
     }
 
 } # time-command
@@ -86,9 +87,10 @@ sub time-command(Str:D $cmd,
 # Params  : A string that contains output from the GNU 'time' command, and two named parameters that describe which type of time values to return and in what format.
 # Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of four formats).
 sub read-sys-time($result,
-                 :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
-                 :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
-                 --> Str) {
+                  :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
+                  :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
+                  Bool :$list = False,                           # return a list as in the original API
+                 ) {
 
     say "DEBUG: time result '$result'" if $DEBUG;
     # get the individual seconds for each type of time
@@ -120,21 +122,32 @@ sub read-sys-time($result,
 	}
     }
 
+    my $res;
     if !$fmt {
         # returning raw seconds
         given $typ {
             when /^ :i a/ {
-                return "Real: $Rts; User: $Uts; Sys: $Sts";
+                $res = "Real: $Rts; User: $Uts; Sys: $Sts";
             }
             when /^ :i r/ {
-                return $Rts;
+                $res = $Rts;
             }
             when /^ :i u/ {
-                return $Uts;
+                $res = $Uts;
             }
             when /^ :i s/ {
-                return $Sts;
+                $res = $Sts;
             }
+        }
+    }
+
+    if $res.defined {
+        if $list {
+            # create and return a list
+        }
+        else {
+            # just return the string
+            return $res;
         }
     }
 
@@ -146,20 +159,25 @@ sub read-sys-time($result,
             my $rt = seconds-to-hms(+$Rts, :$fmt);
             my $ut = seconds-to-hms(+$Uts, :$fmt);
             my $st = seconds-to-hms(+$Sts, :$fmt);
-            return "Real: $rt; User: $ut; Sys: $st";
+            $res = "Real: $rt; User: $ut; Sys: $st";
         }
         when /^ :i r/ {
-            my $t = seconds-to-hms(+$Rts, :$fmt);
-            return $t;
+            $res = seconds-to-hms(+$Rts, :$fmt);
         }
         when /^ :i u/ {
-            my $t = seconds-to-hms(+$Uts, :$fmt);
-            return $t;
+            $res = seconds-to-hms(+$Uts, :$fmt);
         }
         when /^ :i s/ {
-            my $t = seconds-to-hms(+$Sts, :$fmt);
-            return $t;
+            $res = seconds-to-hms(+$Sts, :$fmt);
         }
+    }
+
+    if $list {
+        # create and return a list
+    }
+    else {
+        # just return the string
+        return $res;
     }
 
 } # read-sys-time
