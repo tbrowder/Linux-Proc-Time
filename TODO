@@ -1,3 +1,14 @@
+For next release (soon!)
+========================
+
+fix list return to be like original API [DONE]
+
+modify docs and README to reflect that
+
+add test for list return
+
+add explict tests with an explicit example of a /usr/bin/time result
+
 Possibilities for future releases
 =================================
 

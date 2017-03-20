@@ -7,13 +7,14 @@
 | [read-sys-time](#read-sys-time) | [seconds-to-hms](#seconds-to-hms) | [time-command](#time-command) |
 ### sub read-sys-time
 - Purpose: An internal helper function that is not exported.
-- Params : A string that contains output from the GNU 'time' command, and two named parameters that describe which type of time values to return and in what format.
+- Params : A string that contains output from the GNU 'time' command, and three named parameters that describe which type of time values to return and in what format.
 - Returns: A string consisting in one or all of real (wall clock), user, and system times (in one of four formats).
 ```perl6
 sub read-sys-time($result,
-                 :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
-                 :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
-                 --> Str) {#...}
+                  :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
+                  :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
+                  Bool :$list = False,                           # return a list as in the original API
+                 ) {#...}
 ```
 ### sub seconds-to-hms
 - Purpose: Return input time in seconds (without or with a trailing 's') or convert time in seconds to hms or h:m:s format.
@@ -26,11 +27,12 @@ sub seconds-to-hms($Time,
 ```
 ### sub time-command
 - Purpose: Collect the process times for a system or user command (using the GNU 'time' command).
-- Params : The command as a string, and two named parameters that describe which type of time values to return and in what format. Note that special characters are not recognized by the 'run' routine, so results may not be as expected if they are part of the command.
-- Returns: A string consisting in one or all of real (wall clock), user, and system times (in one of four formats).
+- Params : The command as a string, and three named parameters that describe which type of time values to return and in what format. Note that special characters are not recognized by the 'run' routine, so results may not be as expected if they are part of the command.
+- Returns: A string consisting in one or all of real (wall clock), user, and system times (in one of four formats), or a list as in the original API.
 ```perl6
 sub time-command(Str:D $cmd,
                  :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
                  :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
-                 --> Str) is export(:time-command) {#...}
+                 Bool :$list = False,                           # return a list as in the original API
+                ) is export(:time-command) {#...}
 ```

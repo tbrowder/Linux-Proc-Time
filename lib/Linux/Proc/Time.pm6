@@ -29,63 +29,10 @@ my token fmt { ^ :i             # the desired format for the returned time(s) [d
              $ }
 
 #------------------------------------------------------------------------------
-# Subroutine: time-command
-# Purpose : Collect the process times for a system or user command (using the GNU 'time' command).
-# Params : The command as a string, and two named parameters that describe which type of time values to return and in what format. Note that special characters are not recognized by the 'run' routine, so results may not be as expected if they are part of the command.
-# Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of four formats).
-sub time-command(Str:D $cmd,
-                 :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
-                 :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
-                 Bool :$list = False,                           # return a list as in the original API
-                ) is export(:time-command) {
-    # runs the input cmd using the system 'run' function and returns
-    # the process times shown below
-
-    # look for the time program in several places:
-    my $TCMD;
-    my $TE = 'LINUX_PROC_TIME';
-    my @t = <
-        /usr/bin/time
-        /usr/local/bin
-    >;
-    if %*ENV{$TE}:exists && %*ENV{$TE}.IO.f {
-        $TCMD = %*ENV{$TE};
-    }
-    else {
-        for @t -> $t {
-            if $t.IO.f {
-                $TCMD = $t;
-                last;
-            }
-        }
-    }
-    if !$TCMD.defined {
-        die "FATAL: The 'time' command was not found on this host.";
-    }
-
-    $TCMD ~= ' -p'; # the '-t' option gives the standard POSIX output display
-    my $args = "$TCMD $cmd";
-    my $proc = run $args.words, :err;
-    my $exitcode = $proc.exitcode;
-    if $exitcode {
-        die "FATAL: The '$args' command returned a non-zero exitcode: $exitcode";
-    }
-
-    my $result = $proc.err.slurp-rest;
-    if $fmt.defined {
-        return read-sys-time($result, :$typ, :$fmt, :$list);
-    }
-    else {
-        return read-sys-time($result, :$typ, :$list);
-    }
-
-} # time-command
-
-#------------------------------------------------------------------------------
 # Subroutine: read-sys-time
 # Purpose : An internal helper function that is not exported.
-# Params  : A string that contains output from the GNU 'time' command, and two named parameters that describe which type of time values to return and in what format.
-# Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of four formats).
+# Params  : A string that contains output from the GNU 'time' command, and three named parameters that describe which type of time values to return and in what format.
+# Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of four formats), or a list as in the original API.
 sub read-sys-time($result,
                   :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
                   :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
@@ -144,6 +91,13 @@ sub read-sys-time($result,
     if $res.defined {
         if $list {
             # create and return a list
+	    # in old system: [RUS]ts is the same, [rus]ts is "<seconds to 2 decimals> ]
+            my $rt = seconds-to-hms(+$Rts, :fmt<h>);
+            my $ut = seconds-to-hms(+$Uts, :fmt<h>);
+            my $st = seconds-to-hms(+$Sts, :fmt<h>);
+	    return $Rts, $rt,
+                   $Uts, $ut,
+                   $Sts, $st;
         }
         else {
             # just return the string
@@ -174,6 +128,13 @@ sub read-sys-time($result,
 
     if $list {
         # create and return a list
+	# in old system: [RUS]ts is the same, [rus]ts is "<seconds to 2 decimals> ]
+        my $rt = seconds-to-hms(+$Rts, :fmt<h>);
+        my $ut = seconds-to-hms(+$Uts, :fmt<h>);
+        my $st = seconds-to-hms(+$Sts, :fmt<h>);
+	return $Rts, $rt,
+               $Uts, $ut,
+               $Sts, $st;
     }
     else {
         # just return the string
@@ -220,3 +181,56 @@ sub seconds-to-hms($Time,
     return $ts;
 
 } # seconds-to-hms
+
+#------------------------------------------------------------------------------
+# Subroutine: time-command
+# Purpose : Collect the process times for a system or user command (using the GNU 'time' command).
+# Params : The command as a string, and three named parameters that describe which type of time values to return and in what format. Note that special characters are not recognized by the 'run' routine, so results may not be as expected if they are part of the command.
+# Returns : A string consisting in one or all of real (wall clock), user, and system times (in one of four formats), or a list as in the original API.
+sub time-command(Str:D $cmd,
+                 :$typ where { $typ ~~ &typ } = 'u',            # see token 'typ' definition
+                 :$fmt where { !$fmt.defined || $fmt ~~ &fmt }, # see token 'fmt' definition
+                 Bool :$list = False,                           # return a list as in the original API
+                ) is export(:time-command) {
+    # runs the input cmd using the system 'run' function and returns
+    # the process times shown below
+
+    # look for the time program in several places:
+    my $TCMD;
+    my $TE = 'LINUX_PROC_TIME';
+    my @t = <
+        /usr/bin/time
+        /usr/local/bin
+    >;
+    if %*ENV{$TE}:exists && %*ENV{$TE}.IO.f {
+        $TCMD = %*ENV{$TE};
+    }
+    else {
+        for @t -> $t {
+            if $t.IO.f {
+                $TCMD = $t;
+                last;
+            }
+        }
+    }
+    if !$TCMD.defined {
+        die "FATAL: The 'time' command was not found on this host.";
+    }
+
+    $TCMD ~= ' -p'; # the '-t' option gives the standard POSIX output display
+    my $args = "$TCMD $cmd";
+    my $proc = run $args.words, :err;
+    my $exitcode = $proc.exitcode;
+    if $exitcode {
+        die "FATAL: The '$args' command returned a non-zero exitcode: $exitcode";
+    }
+
+    my $result = $proc.err.slurp-rest;
+    if $fmt.defined {
+        return read-sys-time($result, :$typ, :$fmt, :$list);
+    }
+    else {
+        return read-sys-time($result, :$typ, :$list);
+    }
+
+} # time-command
