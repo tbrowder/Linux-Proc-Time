@@ -3,7 +3,7 @@ use Test;
 
 use Linux::Proc::Time :ALL;
 
-plan 127;
+plan 129;
 
 my token num { \d+ [ \. \d* ]? }
 my token typr { :i real ':' }
@@ -19,6 +19,8 @@ my token as { <typr> \s* <s> ';' \s* <typu> \s* <s> ';' \s* <typs> \s* <s> }
 my token ah { <typr> \s* <h> ';' \s* <typu> \s* <h> ';' \s* <typs> \s* <h> }
 my token aH { <typr> \s* <H> ';' \s* <typu> \s* <H> ';' \s* <typs> \s* <H> }
 
+my token list { <num> \s* <h> \s* <num> \s* <h> \s* <num> \s* <h> }
+
 my $prog = q:to/HERE/;
 my $i = 0;
 for 1..100 {
@@ -31,7 +33,8 @@ spurt $script, $prog;
 my $cmd = "perl6 $script";
 
 my ($res, $typ, $fmt);
-my $debug = False;
+#my $debug = 0;
+my $debug = 1;
 
 my @typ = <a all r real u user s sys>;
 my @fmt = ['s', 'seconds', 'h', 'hms', ':', 'h:m:s'];
@@ -48,7 +51,13 @@ like $res, &num;
 say "debug: test { ++$tn }; \$res = '$res'" if $res && $debug;
 
 # need a subroutine to check $res with like
-sub check($res, :$typ = False, :$fmt = False) {
+sub check($res, :$typ = False, :$fmt = False, :$list = False) {
+    # list overrides all
+    if $list {
+        like $res, &list;
+        return;
+    }
+
     if !$fmt {
         if !$typ ~~ /^a/ {
             like $res, &num;
@@ -148,3 +157,15 @@ for @typ -> $typ {
         say "debug: test { ++$tn }" if $debug;
     }
 }
+
+# check the :$list param
+$fmt = 's';
+$typ = 's';
+my $list = True;
+my @res;
+lives-ok { @res = time-command $cmd, :$typ, :$fmt, :$list };
+$res = join ' ', @res;
+say "debug: test { ++$tn }; \$typ = '$typ'; \$fmt = '$fmt', \$list = '$list'; \$res = '$res'" if $debug;
+check $res, :$typ, :$fmt, :$list;
+say "debug: test { ++$tn }" if $debug;
+
