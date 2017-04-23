@@ -1,6 +1,8 @@
 # Linux::Proc::Time
 [![Build Status](https://travis-ci.org/tbrowder/Linux-Proc-Time-Perl6.svg?branch=master)](https://travis-ci.org/tbrowder/Linux-Proc-Time-Perl6)
 
+## WARNING: This module is deprecated and is being replaced by module Proc::More.
+
 This module uses the GNU **time** command (usually installed as '/usr/bin/time') to time user commands.
 
 ## Synopsis
